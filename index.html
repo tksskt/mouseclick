@@ -10,7 +10,7 @@
   </head>
   <body>
 	  <div id="text-button"  onmousedown="fMouseDown(this)" onmouseup="fMouseUp(this)" style="background-color: white;min-width: 30%; height: 400px; margin: 0 auto;float: left;background-image: url(https://github.com/tksskt/mouseclick/blob/gh-pages/img/mouse_black.png?raw=true);background-size:cover;position: relative;height: 80px;text-align:center;"><p id="text" style="position: absolute;bottom: 0;">クリック</p></div>
-	  <div id="container" style="min-width: 70%; height: 400px; margin: 0 auto"></div>
+	  <div id="container" style="min-width: 70%; height: 400px; margin: 100 auto"></div>
 
 <p><a href="http://sleepyokayu.blogspot.com/2018/05/blog-post_18.html">参考URL：http://sleepyokayu.blogspot.com/2018/05/blog-post_18.html</a></p>
 <script>
@@ -32,20 +32,6 @@ document.getElementById("text-button").fMouseUp = function() {
     input_x1[(x1_wp)] = x;
     x1_wp = (x1_wp +1)%32;
 }
-
-/*
-document.getElementById("text-button").onclick = function() {
-    var x = (new Date()).getTime();
-    input_x0[(x0_wp)] = x;
-    x0_wp = (x0_wp +1)%32;
-}
-
-document.getElementById("text-button").ondblclick = function() {
-    var x = (new Date()).getTime();
-    input_x1[(x1_wp)] = x;
-    x1_wp = (x1_wp +1)%32;
-}
-*/
 
 Highcharts.setOptions({
   global: {
