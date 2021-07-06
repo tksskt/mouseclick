@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang = "ja">
+  <head>
+    <meta charset = "utf-8">
+    <title>マウスチェック</title>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+  </head>
+  <body>
+	  <div id="text-button"  onmousedown="fMouseDown(this)" onmouseup="fMouseUp(this)" style="background-color: white;min-width: 100px; min-height: 160px; margin: 0 auto;float: left;background-image: url(./computer_mouse_double_click.png);background-size:cover;position: relative;height: 80px;text-align:center;"><p id="text" style="position: absolute;bottom: 0;">クリック</p></div>
+	  <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+  <p> マウスのチャタリングを確認する  –  <a href="http://sleepyokayu.blogspot.com/">眠たいお粥 </a> 様からお借りしています。</p>
+<p><a href="http://sleepyokayu.blogspot.com/2018/05/blog-post_18.html">参考URL：http://sleepyokayu.blogspot.com/2018/05/blog-post_18.html</a></p>
+<script>
+var input_x0=Array(32);
+var input_x1=Array(32);
+var x0_rp = 0;
+var x0_wp = 0;
+var x1_rp = 0;
+var x1_wp = 0;
+
+document.getElementById("text-button").fMouseDown = function() {
+    var x = (new Date()).getTime();
+    input_x0[(x0_wp)] = x;
+    x0_wp = (x0_wp +1)%32;
+}
+
+document.getElementById("text-button").fMouseUp = function() {
+    var x = (new Date()).getTime();
+    input_x1[(x1_wp)] = x;
+    x1_wp = (x1_wp +1)%32;
+}
+
+/*
+document.getElementById("text-button").onclick = function() {
+    var x = (new Date()).getTime();
+    input_x0[(x0_wp)] = x;
+    x0_wp = (x0_wp +1)%32;
+}
+
+document.getElementById("text-button").ondblclick = function() {
+    var x = (new Date()).getTime();
+    input_x1[(x1_wp)] = x;
+    x1_wp = (x1_wp +1)%32;
+}
+*/
+
+Highcharts.setOptions({
+  global: {
+    useUTC: false
+  },
+    lang: {
+        numericSymbols: null//軸のkキロ表示をやめる
+    }
+});
+
+Highcharts.chart('container', {
+  chart: {
+   type: 'line',
+    animation: Highcharts.svg, // don't animate in old IE
+    marginRight: 100,//右の軸が隠れるので適切な値にする
+    events: {
+      load: function () {
+        var series0 = this.series[0];
+        var series1 = this.series[1];
+
+        setInterval(function () {
+        var x = (new Date()).getTime(); // current time
+//series0に対する処理
+        var p = x0_wp;
+        while (x0_wp != x0_rp) {
+         series0.addPoint([input_x0[x0_rp], 1], true, true);
+         series0.addPoint([input_x0[x0_rp]+1, 0], true, true);
+
+         series1.addPoint([input_x0[x0_rp], 0], true, true);
+         series1.addPoint([input_x0[x0_rp]+1, 0], true, true);
+         x0_rp = (x0_rp +1)%32;
+        }
+//series1に対する処理
+        p = x1_wp;
+        while (p != x1_rp) {
+         //series1.addPoint([input_x1[x1_rp], 2], true, true);
+         series1.addPoint([input_x1[x1_rp], 1], true, true);
+         series1.addPoint([input_x1[x1_rp]+1, 0], true, true);
+
+         series0.addPoint([input_x0[x1_rp], 0], true, true);
+         series0.addPoint([input_x0[x1_rp]+1, 0], true, true);
+         x1_rp = (x1_rp +1)%32;
+        }
+       }, 500);//0.5秒のインターバルタイマ
+      }
+    }
+
+  },
+  title: {
+    text: 'チャタリングチェック(マウスの画像をクリックでチェック)'
+  },
+  plotOptions: {
+        series: {
+         marker: {
+                enabledThreshold: 0//マークが見えるように
+            }
+        }
+    },
+  xAxis: {
+    type: 'datetime',
+    tickPixelInterval: 150
+  },
+  yAxis: [
+      {
+          title: {
+              text: 'クリック'
+          },
+          plotLines: [{
+              value: 0,
+              width: 1,
+              color: '#FF8080'
+          }],
+          allowDecimals: false    //軸を整数表示
+      },
+  ],
+  tooltip: {
+    formatter: function () {
+      return '<b>' + this.series.name + '</b><br/>' +
+        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' + this.y;
+    }
+  },
+  legend: {
+    enabled: true    //凡例表示
+  },
+  exporting: {
+    enabled: false
+  },
+
+  series: [{
+    name: 'マウスダウン',
+    yAxis: 0,
+    data: (function () {
+      var data = [],
+        time = (new Date()).getTime(),
+        i;
+
+      for (i = -19; i <= 0; i += 1) {
+        data.push({
+          x: time + i * 500,
+          y: 0
+        });
+      }
+      return data;
+    }())
+  },
+  {
+    name: 'マウスアップ',
+    yAxis: 0,
+    data: (function () {
+      var data = [],
+        time = (new Date()).getTime(),
+        i;
+
+      for (i = -19; i <= 0; i += 1) {
+        data.push({
+          x: time + i * 500,
+          y: 0
+        });
+      }
+      return data;
+    }())
+   },
+   ]
+});
+
+
+</script>
+
+
+  </body>
+</html>
